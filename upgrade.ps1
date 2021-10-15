@@ -2,67 +2,46 @@
 param (
     [Parameter(Mandatory=$false)][Switch]$help,
     [Parameter(Mandatory=$false)][Switch]$Windows,
-    [Parameter(Mandatory=$false)][Switch]$Linux,
-    [Parameter(Mandatory=$false)][Switch]$Scoop,
-    [Parameter(Mandatory=$false)][Switch]$Chocolatey,
-    [Parameter(Mandatory=$false)][Switch]$Version,
-    [Parameter(Mandatory=$false)][Switch]$Upgrade
+    [Parameter(Mandatory=$false)][Switch]$Version
 )
 if ($help) {
     Write-Host  "Usage: $((Get-Item $PSCommandPath).Basename) [-w] [-l] [-s] [-c] [-v] [-help]"
     Write-Host  ""
     Write-Host  "    -h, -help          Show this help"
     Write-Host  "    -w, -windows       Disable update check for windows"
-    Write-Host  "    -l, -linux         Disable update check for linux subsystem"
-    Write-Host  "    -s, -scoop         Disable update check for Scoop"
-    Write-Host  "    -c, -chocolatey    Disable update check for Chocolatey"
     Write-Host  "    -v, -version       Show current version"
     exit 0
 }
-if ($Version) {
-    $versionNr = 1,10,0
-    $newUpScript = Invoke-WebRequest "https://raw.githubusercontent.com/ColdEvul/Tools/master/Scripts/upgrade.ps1"
-    $newUpScriptStr = ($newUpScript.Content).ToString() -split '\n'
-    $newUpScriptVer = $newUpScriptStr | Select-String -Pattern 'versionNr'
-    $newUpScriptVer = $newUpScriptVer -split "=" -split "," -replace " ", ""
 
-    Write-Host "Version $($versionNr[0]).$($versionNr[1]).$($versionNr[2])"
-
-    $newUpdateVersion = $false
-    if ($versionNr[0] -lt $newUpScriptVer[1]) {
-        $newUpdateVersion = $true
-    }
-    if ($versionNr[1] -lt $newUpScriptVer[2]) {
-        if ($versionNr[0] -le $newUpScriptVer[1]) {
-            $newUpdateVersion = $true
-        }
-    }
-    if ($versionNr[2] -lt $newUpScriptVer[3]) {
-        if ($versionNr[1] -le $newUpScriptVer[2]) {
-            if ($versionNr[0] -le $newUpScriptVer[1]) {
-                $newUpdateVersion = $true
-            }
-        }
-    }
-
-    if ($newUpdateVersion) {
-        Write-Host "New version avalible v$($newUpScriptVer[1]).$($newUpScriptVer[2]).$($newUpScriptVer[3])"
-        Write-Host "Run `"$((Get-Item $PSCommandPath).Basename) -upgrade`" to update the script."
-        exit 0
-    }
-    exit 0
+# Check for package managers
+Write-Host "Looking for Package Managers and WSL..."
+if ([bool](Test-Path "$env:WINDIR\system32\bash.exe" -PathType Leaf)) {
+    Write-Host " - Detected Windows Subsystem for Linux (WSL)"
+    $HAS_WLS=$TRUE
 }
-if ($Upgrade) {
-    Write-Host "Updating script"
-    $newUpScript = Invoke-WebRequest "https://raw.githubusercontent.com/ColdEvul/Tools/master/Scripts/upgrade.ps1"
-    ($newUpScript.Content).ToString() | Out-File -FilePath (Get-Item $PSCommandPath ).FullName
-    Write-Host "Script update complete"
-    exit 0
+if ([bool](Get-Command -module PSWindowsUpdate)) {
+    Write-Host " - Detected PSWindowsUpdate Powershell Moduel"
+    $HAS_PSWindowsUpdate=$TRUE
 }
+if ([bool](Test-Path "$env:USERPROFILE\scoop\shims\scoop" -PathType Leaf)) { 
+    Write-Host " - Detected Scoop"
+    $HAS_Scoop=$TRUE
+}
+if ([bool](Test-Path "$env:ChocolateyInstall\choco.exe" -PathType Leaf)) {
+    Write-Host " - Detected Chocolatey"
+    $HAS_Chocolatey=$TRUE
+}
+if ([bool](Test-Path "$env:USERPROFILE\AppData\Local\Microsoft\WindowsApps\winget.exe" -PathType Leaf)) {
+    Write-Host " - Detected WinGet (Windows Package Manager)"
+    $HAS_winget=$TRUE
+}
+Write-Host ""
 
+# Check if Admin else exit
 if ( ![bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")) {
     Write-Host "$([io.path]::GetFileNameWithoutExtension("$($MyInvocation.MyCommand.Name)")) is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
+    # check if have sudo programs installed
     $sudoScripts =  "$env:USERPROFILE\scoop\shims\sudo",
                     "$env:USERPROFILE\scoop\shims\sudo.ps1",
                     "$env:PROGRAMDATA\scoop\shims\sudo",
@@ -74,22 +53,20 @@ if ( ![bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups 
     if ($hasSudo) { Write-Host " or run with sudo" -ForegroundColor Red -NoNewline }
     
     Write-Host ", and then try running the script again." -ForegroundColor Red
+
     exit 1
 }
 
-# WSL Update
+# Functions
 function runWSLUpdate {
-    Write-Host "Windows Subsystem for Linux detected..." -ForegroundColor Blue
+
+    Write-Host "Updating your WSL system..." -ForegroundColor Blue
     
-    bash.exe -c "sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y";
+    #bash.exe -c "sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y";
+    Write-Host "Rewriting system WSL update will be back soon...`n" -ForegroundColor DarkGray
     
     Write-Host "Windows Subsystem for Linux update compleat...`n" -ForegroundColor Green
 }
-if ( -Not $Linux -And [bool](Test-Path "$env:WINDIR\system32\bash.exe" -PathType Leaf) ) {
-    runWSLUpdate
-}
-
-# Windows update
 function runWindowsUpdate {
     Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
 
@@ -100,18 +77,6 @@ function runWindowsUpdate {
 
     Write-Host "Windows update compleat...`n" -ForegroundColor Green
 }
-
-if ( -Not $Windows -And [bool](Get-Command -module PSWindowsUpdate) ) {
-    if ( -Not [BOOL](Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "DoNotConnectToWindowsUpdateInternetLocations" ) ) {
-        Write-Host "Checking for windows updates..." -ForegroundColor Blue
-        runWindowsUpdate
-    } else {
-        Write-Host "Windows update is currently disabled in regestry skipping...`n" -ForegroundColor Yellow
-    }
-}
-
-
-# Scoop update
 function runScoopUpdate {
     Write-Host "Updating Scoop repositories..."
     scoop update
@@ -124,24 +89,34 @@ function runScoopUpdate {
 
     Write-Host "Scoop update compleat...`n" -ForegroundColor Green
 }
-if ( -Not $Scoop -And [bool](Test-Path "$env:USERPROFILE\scoop\shims\scoop" -PathType Leaf) ) {
-    Write-Host "Scoop detected..." -ForegroundColor Blue
-    runScoopUpdate
-}
-
-# Chocolatey Update
 function runChocolateyUpdate {
-    Write-Host "Updating packages..." -ForegroundColor Blue
+    Write-Host "Updating Choco packages..." -ForegroundColor Blue
 
     choco upgrade all -y
 
     Write-Host "Chocolatey update compleat...`n" -ForegroundColor Green
 }
+function runWinGetUpdate {
+    Write-Host "Updating WinGet packages..." -ForegroundColor Blue
 
-if ( -Not $Chocolatey -And [bool](Test-Path "$env:ChocolateyInstall\choco.exe" -PathType Leaf) ) {
-    Write-Host "Chocolatey detected..." -ForegroundColor Blue
+    winget upgrade --accept-package-agreements --accept-source-agreements --all
 
-    # Get links on desctop befor installation
+    Write-Host "WinGet update compleat...`n" -ForegroundColor Green
+}
+
+# Run programs if they exist
+if ( $HAS_WLS ) { runWSLUpdate }
+if ( -Not $Windows -And $HAS_PSWindowsUpdate ) {
+    if ( -Not [BOOL](Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "DoNotConnectToWindowsUpdateInternetLocations" ) ) {
+        Write-Host "Checking for windows updates..." -ForegroundColor Blue
+        runWindowsUpdate
+    } else {
+        Write-Host "Windows update is currently disabled in regestry skipping...`n" -ForegroundColor Yellow
+    }
+}
+if ( $HAS_Scoop ) { runScoopUpdate }
+if ( $HAS_Chocolatey ) {
+    # Get links on desktop befor installation
     $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
                     "C:\Users\Default\Desktop\$ShortcutName",
                     "C:\Users\Public\Desktop\$ShortcutName" 
@@ -158,7 +133,6 @@ if ( -Not $Chocolatey -And [bool](Test-Path "$env:ChocolateyInstall\choco.exe" -
 
     # Cleaning up new unwhanted desktop icons
     Write-Host "Cleaning up Chocolatey created desktop icons...`n"
-
     $newDesktopLinks = @()
     foreach ($Desktop in $Desktops) {
         $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
@@ -179,5 +153,7 @@ if ( -Not $Chocolatey -And [bool](Test-Path "$env:ChocolateyInstall\choco.exe" -
         Write-Host "Cleaned up $item" -ForegroundColor DarkGray
     }
 }
+if ( $HAS_winget ) { runWinGetUpdate }
 
 Write-Host "All updates is completed." -ForegroundColor Green
+exit 0
