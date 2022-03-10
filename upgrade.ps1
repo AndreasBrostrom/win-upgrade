@@ -103,6 +103,11 @@ function runWinGetUpdate {
 
     Write-Host "WinGet update compleat...`n" -ForegroundColor Green
 }
+function RemoveShortcut-Item($ShortcutName) {
+    Remove-Item -Path "$env:USERPROFILE\Desktop\$ShortcutName" >$null 2>&1
+    Remove-Item -Path "C:\Users\Default\Desktop\$ShortcutName" >$null 2>&1
+    Remove-Item -Path "C:\Users\Public\Desktop\$ShortcutName" >$null 2>&1
+}
 
 # Run programs if they exist
 if ( $HAS_WLS ) { runWSLUpdate }
@@ -143,17 +148,44 @@ if ( $HAS_Chocolatey ) {
             }
         }
     }
-    function RemoveShortcut-Item($ShortcutName) {
-        Remove-Item -Path "$env:USERPROFILE\Desktop\$ShortcutName" >$null 2>&1
-        Remove-Item -Path "C:\Users\Default\Desktop\$ShortcutName" >$null 2>&1
-        Remove-Item -Path "C:\Users\Public\Desktop\$ShortcutName" >$null 2>&1
+    foreach ($item in $newDesktopLinks) {
+        RemoveShortcut-Item $item
+        Write-Host "Cleaned up $item" -ForegroundColor DarkGray
+    }
+}
+if ( $HAS_winget ) {
+    # Get links on desktop befor installation
+    $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
+                    "C:\Users\Default\Desktop\$ShortcutName",
+                    "C:\Users\Public\Desktop\$ShortcutName" 
+    $preDesktop = @()
+    foreach ($Desktop in $Desktops) {
+        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
+        foreach ($item in $items) {
+            $preDesktop += $item
+        }
+    }
+
+    # Update WinGet
+    runWinGetUpdate 
+
+    # Cleaning up new unwhanted desktop icons
+    Write-Host "Cleaning up WinGet created desktop icons...`n"
+    $newDesktopLinks = @()
+    foreach ($Desktop in $Desktops) {
+        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
+        foreach ($item in $items) {
+            if ($preDesktop -contains $item ) {
+            } else {
+                $newDesktopLinks += $item
+            }
+        }
     }
     foreach ($item in $newDesktopLinks) {
         RemoveShortcut-Item $item
         Write-Host "Cleaned up $item" -ForegroundColor DarkGray
     }
 }
-if ( $HAS_winget ) { runWinGetUpdate }
 
 Write-Host "All updates is completed." -ForegroundColor Green
 exit 0
