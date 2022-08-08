@@ -13,6 +13,12 @@ if ($help) {
     exit 0
 }
 
+$BUILD = "DEV"
+if ( $Version ) {
+    Write-Host "Version: $BUILD"
+    exit 0
+}
+
 # Check for package managers
 Write-Host "Looking for Package Managers and WSL..."
 if ([bool](Test-Path "$env:WINDIR\system32\bash.exe" -PathType Leaf)) {
