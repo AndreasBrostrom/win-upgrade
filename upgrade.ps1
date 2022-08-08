@@ -105,7 +105,7 @@ function runChocolateyUpdate {
 function runWinGetUpdate {
     Write-Host "Updating WinGet packages..." -ForegroundColor Blue
 
-    winget upgrade --accept-package-agreements --accept-source-agreements --all
+    winget upgrade --include-unknown --silent --all
 
     Write-Host "WinGet update compleat...`n" -ForegroundColor Green
 }
