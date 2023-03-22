@@ -21,6 +21,8 @@ if ( $Version ) {
     exit 0
 }
 
+$IS_ADMIN = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+
 # Check for package managers
 Write-Host "Looking for Package Managers and WSL..."
 if ([bool](Test-Path "$env:WINDIR\system32\wsl.exe" -PathType Leaf)) {
@@ -46,7 +48,7 @@ if ([bool](Test-Path "$env:USERPROFILE\AppData\Local\Microsoft\WindowsApps\winge
 Write-Host ""
 
 # Check if Admin else exit
-if ( ![bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")) {
+if (!$IS_ADMIN) {
     Write-Host "$([io.path]::GetFileNameWithoutExtension("$($MyInvocation.MyCommand.Name)")) is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
     # check if have sudo programs installed
@@ -60,9 +62,13 @@ if ( ![bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups 
     foreach ($sudoScript in $sudoScripts) { if ( [System.IO.File]::Exists("$sudoScript") ) { [bool] $hasSudo = 1; break } }
     if ($hasSudo) { Write-Host " or run with sudo" -ForegroundColor Red -NoNewline }
     
-    Write-Host ", and then try running the script again." -ForegroundColor Red
+    Write-Host ", and then running the script again." -ForegroundColor Red
 
-    exit 1
+    if ([bool](Test-Path "$env:USERPROFILE\scoop\shims\scoop" -PathType Leaf)) {
+        Write-Host "Due to scoop being installed we will update its local packages...`n" -ForegroundColor Yellow
+    } else {
+        exit 1
+    }
 }
 
 # Functions
@@ -142,8 +148,10 @@ function runScoopUpdate {
     Write-Host "Updating local packages..."
     scoop update *
 
-    Write-Host "Updating globla packages..."
-    scoop update * --global
+    if ($IS_ADMIN) {
+        Write-Host "Updating globla packages..."
+        scoop update * --global
+    }
 
     Write-Host "Scoop update compleat...`n" -ForegroundColor Green
 }
@@ -168,8 +176,8 @@ function RemoveShortcut-Item($ShortcutName) {
 }
 
 # Run programs if they exist
-if ( $HAS_WLS ) { runWSLUpdate }
-if ( -Not $noWindows -And $HAS_PSWindowsUpdate ) {
+if ( $IS_ADMIN -And $HAS_WLS ) { runWSLUpdate }
+if ( $IS_ADMIN -And -Not $noWindows -And $HAS_PSWindowsUpdate ) {
     if ( -Not [BOOL](Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "DoNotConnectToWindowsUpdateInternetLocations" ) ) {
         Write-Host "Checking for windows updates..." -ForegroundColor Blue
         runWindowsUpdate
@@ -178,7 +186,7 @@ if ( -Not $noWindows -And $HAS_PSWindowsUpdate ) {
     }
 }
 if ( $HAS_Scoop ) { runScoopUpdate }
-if ( $HAS_Chocolatey ) {
+if ( $IS_ADMIN -And $HAS_Chocolatey ) {
     # Get links on desktop befor installation
     $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
                     "C:\Users\Default\Desktop\$ShortcutName",
@@ -211,7 +219,7 @@ if ( $HAS_Chocolatey ) {
         Write-Host "Cleaned up $item" -ForegroundColor DarkGray
     }
 }
-if ( $HAS_winget ) {
+if ( $IS_ADMIN -And  $HAS_winget ) {
     # Get links on desktop befor installation
     $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
                     "C:\Users\Default\Desktop\$ShortcutName",
