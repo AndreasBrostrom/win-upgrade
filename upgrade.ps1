@@ -1,14 +1,16 @@
 # Check parameters
 param (
     [Parameter(Mandatory=$false)][Switch]$help,
-    [Parameter(Mandatory=$false)][Switch]$Windows,
+    [Parameter(Mandatory=$false)][Switch]$noWindows,
+    [Parameter(Mandatory=$false)][Switch]$suMode,
     [Parameter(Mandatory=$false)][Switch]$Version
 )
 if ($help) {
-    Write-Host  "Usage: $((Get-Item $PSCommandPath).Basename) [-w] [-l] [-s] [-c] [-v] [-help]"
+    Write-Host  "Usage: $((Get-Item $PSCommandPath).Basename) [-w] [-s] [-v] [-help]"
     Write-Host  ""
     Write-Host  "    -h, -help          Show this help"
-    Write-Host  "    -w, -windows       Disable update check for windows"
+    Write-Host  "    -w, -noWindows     Disable update check for windows"
+    Write-Host  "    -s, -suMode        Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms."
     Write-Host  "    -v, -version       Show current version"
     exit 0
 }
@@ -21,7 +23,7 @@ if ( $Version ) {
 
 # Check for package managers
 Write-Host "Looking for Package Managers and WSL..."
-if ([bool](Test-Path "$env:WINDIR\system32\bash.exe" -PathType Leaf)) {
+if ([bool](Test-Path "$env:WINDIR\system32\wsl.exe" -PathType Leaf)) {
     Write-Host " - Detected Windows Subsystem for Linux (WSL)"
     $HAS_WLS=$TRUE
 }
@@ -66,12 +68,62 @@ if ( ![bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups 
 # Functions
 function runWSLUpdate {
 
-    Write-Host "Updating your WSL system..." -ForegroundColor Blue
+    Write-Host "Updating WSL distros..." -ForegroundColor Blue
+    if (-not $suMode) {
+        Write-Host "This will update using the root user.`nTo update using your distrobution user run $((Get-Item $PSCommandPath).Basename) with the argument -suMode" -ForegroundColor DarkGray
+    }
     
-    #bash.exe -c "sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y";
-    Write-Host "Rewriting system WSL update will be back soon...`n" -ForegroundColor DarkGray
+    $distrosList = @()
+    wsl.exe --list | ForEach-Object -Process {
+        if ($_ -eq "") {return}
+        if ($_ -eq "Windows Subsystem for Linux Distributions:") {return}
+        $dist = -split "$_"
+        $distName = $dist[0]
+        $DistrosList += $distName
+    }
+    if ($distrosList.count -eq 0) {
+        Write-Host "No WSL distrobutions detected skipping...`n" -ForegroundColor Red
+        return
+    }
+
+    Write-Host "`nUpdating folloing distros:"
+    foreach ($dist in $DistrosList) { Write-Host " - $dist" }
     
-    Write-Host "Windows Subsystem for Linux update compleat...`n" -ForegroundColor Green
+    foreach ($dist in $DistrosList) {
+        # Variable $dist apparently does not work for Start-Process argumentList collected earlier or in the loop it self eather
+        Write-Host "`nUpdating $dist..."
+        if ($dist.ToLower() -eq "arch") {
+            if (-not $suMode) {
+                $distPackageManagers = "eval 'yes `"`" | pacman -Syyuu'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
+            } else {
+                $distPackageManagers = "eval 'yay -Syyu --sudoloop --noconfirm --color=always'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
+            }
+            continue
+        }
+        if ($dist.ToLower() -eq "debian") { 
+            if (-not $suMode) {
+                $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
+            } else {
+                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "-- $distPackageManagers" 
+            }
+            continue
+        }
+        if ($dist.ToLower() -eq "ubuntu") {
+            if (-not $suMode) {
+                $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
+            } else {
+                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "-- $distPackageManagers" 
+            }
+            continue
+        }
+    }
+    Write-Host "`nWindows Subsystem for Linux update compleat...`n" -ForegroundColor Green
 }
 function runWindowsUpdate {
     Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
@@ -117,7 +169,7 @@ function RemoveShortcut-Item($ShortcutName) {
 
 # Run programs if they exist
 if ( $HAS_WLS ) { runWSLUpdate }
-if ( -Not $Windows -And $HAS_PSWindowsUpdate ) {
+if ( -Not $noWindows -And $HAS_PSWindowsUpdate ) {
     if ( -Not [BOOL](Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "DoNotConnectToWindowsUpdateInternetLocations" ) ) {
         Write-Host "Checking for windows updates..." -ForegroundColor Blue
         runWindowsUpdate
