@@ -1,6 +1,8 @@
 # win-upgrade
 **Windows upgrade** or **Upgrade** for short are a update script written in powershell. The script look for your package managers including WSL ones and update them.
 
+![](https://github.com/AndreasBrostrom/win-upgrade/blob/main/resources/demo.png)
+
 To run the script make sure your PS1 file is placed in a location in your path and that you are allowed to run scripts. 
 
 To run the script make sure the script location is placed in your windows `$PATH` variable. (For a real terminal super user fealing.) But you can also just run the script.
