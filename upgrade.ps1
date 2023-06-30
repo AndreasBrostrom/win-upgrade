@@ -1,17 +1,40 @@
 # Check parameters
-param (
-    [Parameter(Mandatory=$false)][Switch]$help,
-    [Parameter(Mandatory=$false)][Switch]$noWindows,
-    [Parameter(Mandatory=$false)][Switch]$suMode,
-    [Parameter(Mandatory=$false)][Switch]$Version
-)
+
+$programName = "$([io.path]::GetFileNameWithoutExtension("$($MyInvocation.MyCommand.Name)"))"
+
+$help           = $false
+$noWindows      = $false
+$suMode         = $false
+$version        = $false
+foreach ($arg in $args) {
+    if ($arg -in @("--help", "-h")) {
+        $help = $TRUE
+        continue
+    } elseif ($arg -in @("-noWindowsUpdate", "-w")) {
+        $noWindows = $TRUE
+        continue
+    } elseif ($arg -in @("--suMode", "-su")) {
+        $suMode = $TRUE
+        continue
+    } elseif ($arg -in @("--version", "--v")) {
+        $version = $TRUE
+        continue
+    } else{
+        Write-Host "${programName}: '$arg' unknown argument" -ForegroundColor Red
+        exit 1
+    }
+
+}
+
+
+
 if ($help) {
-    Write-Host  "Usage: $((Get-Item $PSCommandPath).Basename) [-w] [-s] [-v] [-help]"
+    Write-Host  "Usage: ${programName} [-w] [-su] [-v] [-help]"
     Write-Host  ""
-    Write-Host  "    -h, -help          Show this help"
-    Write-Host  "    -w, -noWindows     Disable update check for windows"
-    Write-Host  "    -s, -suMode        Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms."
-    Write-Host  "    -v, -version       Show current version"
+    Write-Host  "    -h, --help                Show this help"
+    Write-Host  "    -w, --noWindowsUpdate     Disable update check for windows"
+    Write-Host  "    -su, --suMode             Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms."
+    Write-Host  "    -v, --version             Show current version"
     exit 0
 }
 
@@ -49,7 +72,7 @@ Write-Host ""
 
 # Check if Admin else exit
 if (!$IS_ADMIN) {
-    Write-Host "$([io.path]::GetFileNameWithoutExtension("$($MyInvocation.MyCommand.Name)")) is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
+    Write-Host "${programName} is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
     # check if have sudo programs installed
     $sudoScripts =  "$env:USERPROFILE\scoop\shims\sudo",
@@ -76,7 +99,7 @@ function runWSLUpdate {
 
     Write-Host "Updating WSL distros..." -ForegroundColor Blue
     if (-not $suMode) {
-        Write-Host "This will update using the root user.`nTo update using your distrobution user run $((Get-Item $PSCommandPath).Basename) with the argument -suMode" -ForegroundColor DarkGray
+        Write-Host "This will update using the root user.`nTo update using your distrobution user run $programName with the argument --suMode" -ForegroundColor DarkGray
     }
     
     $distrosList = @()
