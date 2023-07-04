@@ -75,12 +75,14 @@ if (!$IS_ADMIN) {
     Write-Host "${programName} is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
     # check if have sudo programs installed
-    $sudoScripts =  "$env:USERPROFILE\scoop\shims\sudo",
-                    "$env:USERPROFILE\scoop\shims\sudo.ps1",
-                    "$env:PROGRAMDATA\scoop\shims\sudo",
-                    "$env:PROGRAMDATA\scoop\shims\sudo.ps1",
-                    "$env:PROGRAMDATA\chocolatey\bin\Sudo.exe",
-                    "$env:USERPROFILE\.bin\sudo.ps1"
+        $sudoScripts =  "$env:USERPROFILE\scoop\shims\sudo",
+                        "$env:USERPROFILE\scoop\shims\sudo.ps1",
+                        "$env:PROGRAMDATA\scoop\shims\sudo",
+                        "$env:PROGRAMDATA\scoop\shims\sudo.ps1",
+                        "$env:PROGRAMDATA\chocolatey\bin\Sudo.exe",
+                        "$env:USERPROFILE\.bin\sudo.ps1",
+                        "$env:SCOOP_GLOBAL\shims\sudo",
+                        "$env:SCOOP_GLOBAL\shims\sudo.ps1"
 
     foreach ($sudoScript in $sudoScripts) { if ( [System.IO.File]::Exists("$sudoScript") ) { [bool] $hasSudo = 1; break } }
     if ($hasSudo) { Write-Host " or run with sudo" -ForegroundColor Red -NoNewline }
@@ -143,7 +145,7 @@ function runWSLUpdate {
         }
         if ($dist.ToLower() -eq "ubuntu") {
             if (-not $suMode) {
-                $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
+                $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
             } else {
                 $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
