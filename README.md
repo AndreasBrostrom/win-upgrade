@@ -14,7 +14,7 @@ The script can detect:
  - [Chocolatey](https://chocolatey.org/)
  - [WinGet](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (Windows Package Manager)
 
-```
+```pwsh
 Usage: upgrade [-w] [-s] [-v] [-help]
 
     -h, -help          Show this help
@@ -24,3 +24,20 @@ Usage: upgrade [-w] [-s] [-v] [-help]
 ```
 
 ***Note!** When using a sudo windows script i recommend you using [lukesampson sudo](https://github.com/lukesampson/psutils/blob/master/sudo.ps1) simply run `scoop install sudo`.*
+
+## Install
+
+1. Create a .bin directory in your home directory and make sure it added to your path.
+   ```pwsh
+   PS> New-Item -itemtype "directory" -path "$Env:userprofile\.bin" -Force
+   PS> [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$Env:userprofile\.bin", "User")
+   ```
+2. Unzip latest release
+   ```pwsh
+   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.1.zip" -DestinationPath "$Env:userprofile\.bin"
+   PS> Remove-Item "$Env:userprofile\.bin\README.md"
+   ```
+3. Run
+   ```pwsh
+   PS> upgrade
+   ```
