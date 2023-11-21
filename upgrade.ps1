@@ -128,8 +128,8 @@ function runWSLUpdate {
     
     foreach ($dist in $DistrosList) {
         # Variable $dist apparently does not work for Start-Process argumentList collected earlier or in the loop it self eather
-        Write-Host "`nUpdating $dist..."
         if ($dist.ToLower() -eq "arch") {
+            Write-Host "`nUpdating $dist..."
             if (-not $suMode) {
                 $distPackageManagers = "eval 'yes `"`" | pacman -Syyuu'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
@@ -140,6 +140,7 @@ function runWSLUpdate {
             continue
         }
         if ($dist.ToLower() -eq "debian") { 
+            Write-Host "`nUpdating $dist..."
             if (-not $suMode) {
                 $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
@@ -150,6 +151,7 @@ function runWSLUpdate {
             continue
         }
         if ($dist.ToLower() -eq "ubuntu") {
+            Write-Host "`nUpdating $dist..."
             if (-not $suMode) {
                 $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
@@ -159,6 +161,9 @@ function runWSLUpdate {
             }
             continue
         }
+
+        Write-Host "`nSkipping update for $dist..."
+        Write-Host "$dist not yet supported...`nSubmit a issue to add support: https://github.com/AndreasBrostrom/win-upgrade/issues" -ForegroundColor Yellow
     }
     Write-Host "`nWindows Subsystem for Linux update compleat...`n" -ForegroundColor Green
 }
