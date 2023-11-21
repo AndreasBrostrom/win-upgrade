@@ -174,7 +174,7 @@ function runWindowsUpdate {
         Write-Host "Windows update compleat...`n" -ForegroundColor Green
     }
     Catch {
-        Write-Host "Windows update don't work with remote connection...`nAccess is denied. (0x80070005 (E_ACCESSDENIED))`n" -ForegroundColor Red
+        Write-Host "Windows update don't work with remote connection...`n$_`n" -ForegroundColor Red
         return
     }
 }
