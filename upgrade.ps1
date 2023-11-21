@@ -165,12 +165,18 @@ function runWSLUpdate {
 function runWindowsUpdate {
     Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
 
-    Write-Host "Checking for updates..."
-    Get-WindowsUpdate
-    Write-Host "Installing updates..."
-    Install-WindowsUpdate -AcceptAll -IgnoreReboot -Install >$null 2>&1
+    Try {
+        Write-Host "Checking for updates..."
+        Get-WindowsUpdate
+        Write-Host "Installing updates..."
+        Install-WindowsUpdate -AcceptAll -IgnoreReboot -Install >$null 2>&1
 
-    Write-Host "Windows update compleat...`n" -ForegroundColor Green
+        Write-Host "Windows update compleat...`n" -ForegroundColor Green
+    }
+    Catch {
+        Write-Host "Windows update don't work with remote connection...`nAccess is denied. (0x80070005 (E_ACCESSDENIED))`n" -ForegroundColor Red
+        return
+    }
 }
 function runScoopUpdate {
     Write-Host "Updating Scoop repositories..."
