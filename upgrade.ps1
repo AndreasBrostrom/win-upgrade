@@ -115,7 +115,7 @@ function runWSLUpdate {
         }
     }
     Catch {
-        Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
+        Write-Host "WSL not supported via remote connections...`n$_`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
         return
     }
     if ($distrosList.count -eq 0) {
