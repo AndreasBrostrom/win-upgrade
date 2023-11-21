@@ -105,12 +105,18 @@ function runWSLUpdate {
     }
     
     $distrosList = @()
-    wsl.exe --list | ForEach-Object -Process {
-        if ($_ -eq "") {return}
-        if ($_ -eq "Windows Subsystem for Linux Distributions:") {return}
-        $dist = -split "$_"
-        $distName = $dist[0]
-        $DistrosList += $distName
+    Try {
+        wsl.exe --list | ForEach-Object -Process {
+            if ($_ -eq "") {return}
+            if ($_ -eq "Windows Subsystem for Linux Distributions:") {return}
+            $dist = -split "$_"
+            $distName = $dist[0]
+            $DistrosList += $distName
+        }
+    }
+    Catch {
+        Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
+        return
     }
     if ($distrosList.count -eq 0) {
         Write-Host "No WSL distrobutions detected skipping...`n" -ForegroundColor Red
