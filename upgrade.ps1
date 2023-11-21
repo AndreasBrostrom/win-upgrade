@@ -179,6 +179,8 @@ function runWindowsUpdate {
     }
 }
 function runScoopUpdate {
+    Write-Host "Updating Scoop..." -ForegroundColor Blue
+
     Write-Host "Updating Scoop repositories..."
     scoop update
 
