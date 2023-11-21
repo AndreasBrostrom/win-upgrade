@@ -106,9 +106,11 @@ function runWSLUpdate {
     
     $distrosList = @()
     Try {
+        $i=0
         wsl.exe --list | ForEach-Object -Process {
+            $i++
+            if ($i -lt 2) {return}
             if ($_ -eq "") {return}
-            if ($_ -eq "Windows Subsystem for Linux Distributions:") {return}
             $dist = -split "$_"
             $distName = $dist[0]
             $DistrosList += $distName
