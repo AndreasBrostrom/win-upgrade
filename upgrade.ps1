@@ -213,68 +213,36 @@ if ( $IS_ADMIN -And -Not $noWindows -And $HAS_PSWindowsUpdate ) {
 if ( $HAS_Scoop ) { runScoopUpdate }
 if ( $IS_ADMIN -And $HAS_Chocolatey ) {
     # Get links on desktop befor installation
-    $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
-                    "C:\Users\Default\Desktop\$ShortcutName",
-                    "C:\Users\Public\Desktop\$ShortcutName" 
-    $preDesktop = @()
-    foreach ($Desktop in $Desktops) {
-        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
-        foreach ($item in $items) {
-            $preDesktop += $item
-        }
-    }
+    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
 
     # Update choco
     runChocolateyUpdate
 
     # Cleaning up new unwhanted desktop icons
     Write-Host "Cleaning up Chocolatey created desktop icons...`n"
-    $newDesktopLinks = @()
-    foreach ($Desktop in $Desktops) {
-        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
-        foreach ($item in $items) {
-            if ($preDesktop -contains $item ) {
-            } else {
-                $newDesktopLinks += $item
-            }
-        }
-    }
-    foreach ($item in $newDesktopLinks) {
-        RemoveShortcut-Item $item
-        Write-Host "Cleaned up $item" -ForegroundColor DarkGray
+    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
+        Remove-Item -LiteralPath $_.FullName
+        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
     }
 }
 if ( $IS_ADMIN -And  $HAS_winget ) {
     # Get links on desktop befor installation
-    $Desktops =    "$env:USERPROFILE\Desktop\$ShortcutName",
-                    "C:\Users\Default\Desktop\$ShortcutName",
-                    "C:\Users\Public\Desktop\$ShortcutName" 
-    $preDesktop = @()
-    foreach ($Desktop in $Desktops) {
-        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
-        foreach ($item in $items) {
-            $preDesktop += $item
-        }
-    }
+    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
 
     # Update WinGet
     runWinGetUpdate 
 
     # Cleaning up new unwhanted desktop icons
     Write-Host "Cleaning up WinGet created desktop icons...`n"
-    $newDesktopLinks = @()
-    foreach ($Desktop in $Desktops) {
-        $items = Get-ChildItem -Path $Desktop -Name -Include "*.lnk"
-        foreach ($item in $items) {
-            if ($preDesktop -contains $item ) {
-            } else {
-                $newDesktopLinks += $item
-            }
-        }
-    }
-    foreach ($item in $newDesktopLinks) {
-        RemoveShortcut-Item $item
-        Write-Host "Cleaned up $item" -ForegroundColor DarkGray
+    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
+        Remove-Item -LiteralPath $_.FullName
+        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
     }
 }
 
