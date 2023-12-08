@@ -34,7 +34,7 @@ Usage: upgrade [-w] [-s] [-v] [-help]
    ```
 2. Unzip latest release
    ```pwsh
-   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.1.zip" -DestinationPath "$Env:userprofile\.bin"
+   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.2.zip" -DestinationPath "$Env:userprofile\.bin"
    PS> Remove-Item "$Env:userprofile\.bin\README.md"
    ```
 3. Run
