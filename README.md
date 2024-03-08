@@ -9,7 +9,7 @@ To run the script make sure the script location is placed in your windows `$PATH
 
 The script can detect:
  - [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) (WSL)
- - [PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate/2.2.0.2) (Powershell Moduel)
+ - [PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate) (Powershell Moduel)
  - [Scoop](https://scoop.sh/)
  - [Chocolatey](https://chocolatey.org/)
  - [WinGet](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (Windows Package Manager)
@@ -34,7 +34,7 @@ Usage: upgrade [-w] [-s] [-v] [-help]
    ```
 2. Unzip latest release
    ```pwsh
-   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.2.zip" -DestinationPath "$Env:userprofile\.bin"
+   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.3.zip" -DestinationPath "$Env:userprofile\.bin"
    PS> Remove-Item "$Env:userprofile\.bin\README.md"
    ```
 3. Run
