@@ -5,11 +5,11 @@
 
 To run the script make sure your PS1 file is placed in a location in your path and that you are allowed to run scripts. 
 
-To run the script make sure the script location is placed in your windows `$PATH` variable. (For a real terminal super user fealing.) But you can also just run the script.
+To run the script make sure the script location is placed in your windows `$PATH` variable. (For a real terminal super user feeling.) But you can also just run the script.
 
 The script can detect:
  - [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install) (WSL)
- - [PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate) (Powershell Moduel)
+ - [PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate) (Powershell Module)
  - [Scoop](https://scoop.sh/)
  - [Chocolatey](https://chocolatey.org/)
  - [WinGet](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (Windows Package Manager)
