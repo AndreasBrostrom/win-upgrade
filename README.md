@@ -27,17 +27,22 @@ Usage: upgrade [-w] [-s] [-v] [-help]
 
 ## Install
 
-1. Create a .bin directory in your home directory and make sure it added to your path.
+1. Create a `.bin` directory in your home directory and make sure it added to your `$path` environment.
    ```pwsh
-   PS> New-Item -itemtype "directory" -path "$Env:userprofile\.bin" -Force
-   PS> [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$Env:userprofile\.bin", "User")
+   PS> New-Item -itemtype "directory" -path "$env:userprofile\.bin" -Force
+   PS> [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:userprofile\.bin", "User")
    ```
-2. Unzip latest release
+2. Download latest release ([Can be found here](https://github.com/AndreasBrostrom/win-upgrade/releases/latest))
+   ```
+   PS> $version=(irm 'https://api.github.com/repos/AndreasBrostrom/win-upgrade/releases/latest' | Select tag_name).tag_name
+   PS> iwr -URI "https://github.com/AndreasBrostrom/win-upgrade/releases/download/$version/upgrade-$version.zip" -OutFile "$env:userprofile/Downloads/latest.zip"
+   ```
+3. Unzip latest release
    ```pwsh
-   PS> Expand-Archive "$Env:userprofile\Downloads\upgrade-1.0.3.zip" -DestinationPath "$Env:userprofile\.bin"
-   PS> Remove-Item "$Env:userprofile\.bin\README.md"
+   PS> Expand-Archive "$env:userprofile\Downloads\upgrade-latest.zip" -DestinationPath "$env:userprofile\.bin"
+   PS> Remove-Item "$env:userprofile\.bin\README.md"
    ```
-3. Run
+4. Run
    ```pwsh
    PS> upgrade
    ```
