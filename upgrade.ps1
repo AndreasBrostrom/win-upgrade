@@ -5,6 +5,7 @@ $programName = "$([io.path]::GetFileNameWithoutExtension("$($MyInvocation.MyComm
 $help           = $false
 $noWindows      = $false
 $suMode         = $false
+$updateWSL      = $false
 $version        = $false
 foreach ($arg in $args) {
     if ($arg -in @("--help", "-h")) {
@@ -15,6 +16,9 @@ foreach ($arg in $args) {
         continue
     } elseif ($arg -in @("--suMode", "-su")) {
         $suMode = $TRUE
+        continue
+    } elseif ($arg -in @("--updateWSL")) {
+        $updateWSL = $TRUE
         continue
     } elseif ($arg -in @("--version", "-v")) {
         $version = $TRUE
@@ -34,6 +38,9 @@ if ($help) {
     Write-Host  "    -h, --help                Show this help"
     Write-Host  "    -w, --noWindowsUpdate     Disable update check for windows"
     Write-Host  "    -su, --suMode             Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms."
+    Write-Host
+    Write-Host  "    --updateWSL               Upgrade WSL client"
+    Write-Host
     Write-Host  "    -v, --version             Show current version"
     exit 0
 }
@@ -98,6 +105,11 @@ if (!$IS_ADMIN) {
 
 # Functions
 function runWSLUpdate {
+
+    if ($updateWSL) {
+        Write-Host "Updating WSL client..." -ForegroundColor Blue
+        wsl --update
+    }
 
     Write-Host "Updating WSL distros..." -ForegroundColor Blue
     if (-not $suMode) {
