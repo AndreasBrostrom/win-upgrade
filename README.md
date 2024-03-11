@@ -35,7 +35,7 @@ Usage: upgrade [-w] [-s] [-v] [-help]
 2. Download latest release ([Can be found here](https://github.com/AndreasBrostrom/win-upgrade/releases/latest))
    ```
    PS> $version=(irm 'https://api.github.com/repos/AndreasBrostrom/win-upgrade/releases/latest' | Select tag_name).tag_name
-   PS> iwr -URI "https://github.com/AndreasBrostrom/win-upgrade/releases/download/$version/upgrade-$version.zip" -OutFile "$env:userprofile/Downloads/latest.zip"
+   PS> iwr -URI "https://github.com/AndreasBrostrom/win-upgrade/releases/download/$version/upgrade-$version.zip" -OutFile "$env:userprofile/Downloads/upgrade-latest.zip"
    ```
 3. Unzip latest release
    ```pwsh
