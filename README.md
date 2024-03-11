@@ -27,7 +27,7 @@ Usage: upgrade [-w] [-s] [-v] [-help]
 
 ## Install
 
-1. Create a `.bin` directory in your home directory and make sure it added to your `$path` environment.
+1. Create a `.bin` directory in your home directory and make sure it added to your `$PATH` environment variable.
    ```pwsh
    PS> New-Item -itemtype "directory" -path "$env:userprofile\.bin" -Force
    PS> [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:userprofile\.bin", "User")
