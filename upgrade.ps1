@@ -45,7 +45,7 @@ if ($help) {
     exit 0
 }
 
-$BUILD = "DEV"
+$BUILD = "GIT"
 if ( $Version ) {
     Write-Host "Version: $BUILD"
     exit 0
