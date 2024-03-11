@@ -15,12 +15,17 @@ The script can detect:
  - [WinGet](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (Windows Package Manager)
 
 ```pwsh
-Usage: upgrade [-w] [-s] [-v] [-help]
+PS > upgrade --help     
+Usage: upgrade [-w] [-su] [-v] [-help]
 
-    -h, -help          Show this help
-    -w, -noWindows     Disable update check for windows
-    -s, -suMode        Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms.
-    -v, -version       Show current version
+    -h, --help                Show this help
+    -w, --noWindowsUpdate     Disable update check for windows
+    -su, --suMode             Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms.
+
+    --updateWSL               Upgrade WSL client
+
+    -v, --version             Show current version
+
 ```
 
 ***Note!** When using a sudo windows script i recommend you using [lukesampson sudo](https://github.com/lukesampson/psutils/blob/master/sudo.ps1) simply run `scoop install sudo`.*
