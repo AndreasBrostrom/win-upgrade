@@ -137,7 +137,7 @@ function runWSLUpdate {
         return
     }
 
-    Write-Host "`nUpdating folloing distros:"
+    Write-Host "`nUpdating following distros:"
     foreach ($dist in $DistrosList) { Write-Host " - $dist" }
     
     foreach ($dist in $DistrosList) {
