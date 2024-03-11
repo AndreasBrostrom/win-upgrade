@@ -155,10 +155,10 @@ function runWSLUpdate {
         if ($dist.ToLower() -eq "ubuntu") {
             Write-Host "`nUpdating $dist..."
             if (-not $suMode) {
-                $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y'"
+                $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y && snap refresh'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
             } else {
-                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
+                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo snap refresh'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "-- $distPackageManagers" 
             }
             continue
