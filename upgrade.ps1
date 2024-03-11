@@ -109,6 +109,7 @@ function runWSLUpdate {
     if ($updateWSL) {
         Write-Host "Updating WSL client..." -ForegroundColor Blue
         wsl --update
+        Write-Host
     }
 
     Write-Host "Updating WSL distros..." -ForegroundColor Blue
