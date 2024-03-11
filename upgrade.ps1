@@ -16,7 +16,7 @@ foreach ($arg in $args) {
     } elseif ($arg -in @("--suMode", "-su")) {
         $suMode = $TRUE
         continue
-    } elseif ($arg -in @("--version", "--v")) {
+    } elseif ($arg -in @("--version", "-v")) {
         $version = $TRUE
         continue
     } else{
