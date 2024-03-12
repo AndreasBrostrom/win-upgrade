@@ -109,6 +109,19 @@ function RemoveShortcut-Item($ShortcutName) {
     Remove-Item -Path "C:\Users\Default\Desktop\$ShortcutName" >$null 2>&1
     Remove-Item -Path "C:\Users\Public\Desktop\$ShortcutName" >$null 2>&1
 }
+function Test-PendingReboot {
+    if (Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction Ignore) { return $true }
+    if (Get-Item "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction Ignore) { return $true }
+    if (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -Name PendingFileRenameOperations -ErrorAction Ignore) { return $true }
+    try {
+        $util = [wmiclass]"\\.\root\ccm\clientsdk:CCM_ClientUtilities"
+        $status = $util.DetermineIfRebootPending()
+        if (($status -ne $null) -and $status.RebootPending) {
+            return $true
+        }
+    } catch { return $false };
+    return $false
+}
 
 # Upgrade functions
 function runWSLUpdate {
@@ -265,6 +278,7 @@ function runWinGetUpdate {
     Write-Host "`nWinGet update compleat...`n`n" -ForegroundColor Green
 }
 
+
 # Run programs if they exist
 if ( $IS_ADMIN -And $HAS_WLS ) { runWSLUpdate }
 if ( $IS_ADMIN -And -Not $noWindows -And $HAS_PSWindowsUpdate ) {
@@ -280,4 +294,9 @@ if ( $IS_ADMIN -And $HAS_Chocolatey ) { runChocolateyUpdate}
 if ( $IS_ADMIN -And  $HAS_winget ) { runWinGetUpdate }
 
 Write-Host "All updates is completed." -ForegroundColor Green
+
+if (Test-PendingReboot) {
+    Write-Host "Reboot is required, but do it manually." -ForegroundColor Yellow
+}
+
 exit 0
