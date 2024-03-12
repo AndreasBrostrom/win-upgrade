@@ -266,7 +266,16 @@ function runWinGetUpdate {
     # Update WinGet
     winget upgrade --include-unknown --silent --all
 
-    Write-Host "WinGet update compleat...`n" -ForegroundColor Green
+    # Cleaning up new unwhanted desktop icons
+    Write-Host "`nCleaning up WinGet created desktop icons..."
+    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
+        Remove-Item -LiteralPath $_.FullName
+        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
+    }
+
+    Write-Host "`nWinGet update compleat...`n`n" -ForegroundColor Green
 }
 
 
