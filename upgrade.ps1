@@ -104,6 +104,13 @@ if (!$IS_ADMIN) {
 }
 
 # Functions
+function RemoveShortcut-Item($ShortcutName) {
+    Remove-Item -Path "$env:USERPROFILE\Desktop\$ShortcutName" >$null 2>&1
+    Remove-Item -Path "C:\Users\Default\Desktop\$ShortcutName" >$null 2>&1
+    Remove-Item -Path "C:\Users\Public\Desktop\$ShortcutName" >$null 2>&1
+}
+
+# Upgrade functions
 function runWSLUpdate {
 
     if ($updateWSL) {
@@ -144,7 +151,7 @@ function runWSLUpdate {
     foreach ($dist in $DistrosList) {
         # Variable $dist apparently does not work for Start-Process argumentList collected earlier or in the loop it self eather
         if ($dist.ToLower() -eq "arch") {
-            Write-Host "`nUpdating $dist..."
+            Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
                 $distPackageManagers = "eval 'yes `"`" | pacman -Syyuu'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
@@ -155,7 +162,7 @@ function runWSLUpdate {
             continue
         }
         if ($dist.ToLower() -eq "debian") { 
-            Write-Host "`nUpdating $dist..."
+            Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
                 $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
@@ -166,7 +173,7 @@ function runWSLUpdate {
             continue
         }
         if ($dist.ToLower() -eq "ubuntu") {
-            Write-Host "`nUpdating $dist..."
+            Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
                 $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y && snap refresh'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
@@ -177,24 +184,25 @@ function runWSLUpdate {
             continue
         }
 
-        Write-Host "`nSkipping update for $dist..."
+        Write-Host "`nSkipping update for $dist..." -ForegroundColor DarkCyan
         Write-Host "$dist not yet supported...`nSubmit a issue to add support: https://github.com/AndreasBrostrom/win-upgrade/issues" -ForegroundColor Yellow
     }
-    Write-Host "`nWindows Subsystem for Linux update compleat...`n" -ForegroundColor Green
+    Write-Host "`nWindows Subsystem for Linux update compleat...`n`n" -ForegroundColor Green
 }
 function runWindowsUpdate {
-    Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
 
     Try {
         Write-Host "Checking for updates..."
+        Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
         Get-WindowsUpdate
-        Write-Host "Installing updates..."
+        Write-Host "`nInstalling updates..."
+        Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
         Install-WindowsUpdate -AcceptAll -IgnoreReboot -Install >$null 2>&1
 
-        Write-Host "Windows update compleat...`n" -ForegroundColor Green
+        Write-Host "`nWindows update compleat...`n`n" -ForegroundColor Green
     }
     Catch {
-        Write-Host "Windows update don't work with remote connection...`n$_`n" -ForegroundColor Red
+        Write-Host "Windows update don't work with remote connection...`n$_`n`n" -ForegroundColor Red
         return
     }
 }
@@ -212,26 +220,49 @@ function runScoopUpdate {
         scoop update * --global
     }
 
-    Write-Host "Scoop update compleat...`n" -ForegroundColor Green
+    Write-Host "`nScoop update compleat...`n`n" -ForegroundColor Green
 }
 function runChocolateyUpdate {
     Write-Host "Updating Choco packages..." -ForegroundColor Blue
 
+    # Get links on desktop befor installation
+    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+
+    # Update choco
     choco upgrade all -y
 
-    Write-Host "Chocolatey update compleat...`n" -ForegroundColor Green
+    # Cleaning up new unwhanted desktop icons
+    Write-Host "`nCleaning up Chocolatey created desktop icons..."
+    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
+        Remove-Item -LiteralPath $_.FullName
+        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
+    }
+
+    Write-Host "`nChocolatey update compleat...`n`n" -ForegroundColor Green
 }
 function runWinGetUpdate {
     Write-Host "Updating WinGet packages..." -ForegroundColor Blue
 
+    # Get links on desktop befor installation
+    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+
+    # Update WinGet
     winget upgrade --include-unknown --silent --all
 
-    Write-Host "WinGet update compleat...`n" -ForegroundColor Green
-}
-function RemoveShortcut-Item($ShortcutName) {
-    Remove-Item -Path "$env:USERPROFILE\Desktop\$ShortcutName" >$null 2>&1
-    Remove-Item -Path "C:\Users\Default\Desktop\$ShortcutName" >$null 2>&1
-    Remove-Item -Path "C:\Users\Public\Desktop\$ShortcutName" >$null 2>&1
+    # Cleaning up new unwhanted desktop icons
+    Write-Host "`nCleaning up WinGet created desktop icons..."
+    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
+        Get-ChildItem -Filter '*.lnk'
+    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
+        Remove-Item -LiteralPath $_.FullName
+        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
+    }
+
+    Write-Host "`nWinGet update compleat...`n`n" -ForegroundColor Green
 }
 
 # Run programs if they exist
@@ -245,40 +276,8 @@ if ( $IS_ADMIN -And -Not $noWindows -And $HAS_PSWindowsUpdate ) {
     }
 }
 if ( $HAS_Scoop ) { runScoopUpdate }
-if ( $IS_ADMIN -And $HAS_Chocolatey ) {
-    # Get links on desktop befor installation
-    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
-        Get-ChildItem -Filter '*.lnk'
-
-    # Update choco
-    runChocolateyUpdate
-
-    # Cleaning up new unwhanted desktop icons
-    Write-Host "Cleaning up Chocolatey created desktop icons...`n"
-    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
-        Get-ChildItem -Filter '*.lnk'
-    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
-        Remove-Item -LiteralPath $_.FullName
-        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
-    }
-}
-if ( $IS_ADMIN -And  $HAS_winget ) {
-    # Get links on desktop befor installation
-    $preDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
-        Get-ChildItem -Filter '*.lnk'
-
-    # Update WinGet
-    runWinGetUpdate 
-
-    # Cleaning up new unwhanted desktop icons
-    Write-Host "Cleaning up WinGet created desktop icons...`n"
-    $postDesktop = [Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('CommonDesktop') |
-        Get-ChildItem -Filter '*.lnk'
-    $postDesktop | Where-Object FullName -notin $preDesktop.FullName | Foreach-Object {
-        Remove-Item -LiteralPath $_.FullName
-        Write-Host "Cleaned up $($_.Name)" -ForegroundColor DarkGray
-    }
-}
+if ( $IS_ADMIN -And $HAS_Chocolatey ) { runChocolateyUpdate}
+if ( $IS_ADMIN -And  $HAS_winget ) { runWinGetUpdate }
 
 Write-Host "All updates is completed." -ForegroundColor Green
 exit 0
