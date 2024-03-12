@@ -206,10 +206,10 @@ function runWindowsUpdate {
 
     Try {
         Write-Host "Checking for updates..."
-        Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
+        Write-Host "This may take some time stand by..." -ForegroundColor DarkGray
         Get-WindowsUpdate
         Write-Host "`nInstalling updates..."
-        Write-Host "This can take some time stand by..." -ForegroundColor DarkGray
+        Write-Host "This may take some time stand by..." -ForegroundColor DarkGray
         Install-WindowsUpdate -AcceptAll -IgnoreReboot -Install >$null 2>&1
 
         Write-Host "`nWindows update compleat...`n`n" -ForegroundColor Green
