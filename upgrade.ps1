@@ -182,14 +182,11 @@ function runWSLUpdate {
                     "eval '" +
                     "sudo -v;" +
                     "type yay > /dev/null 2>&1 &&" +
-                    "  echo -e `"\033[1;32myay\033[0m`" &&" +
                     "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
                     "type paru > /dev/null 2>&1 &&" +
-                    "  echo -e `"\033[1;32mparu\033[0m`" &&" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
-                    "echo -e `"\033[1;32mpacman\033[0m`" &&" +
                     "  yes `"`" | sudo pacman -Syyuu;" +
                     "'"
                 )
@@ -202,24 +199,29 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "if type yay > /dev/null 2>&1; then" +
-                    "  echo -e `"\033[1;32myay\033[0m`";" +
-                    "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always;" +
-                    "  exit `$?;" +
-                    "fi;" +
-                    "if type paru > /dev/null 2>&1; then" +
-                    "  echo -e `"\033[1;32mparu\033[0m`";" +
-                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
-                    "  exit `$?;" +
-                    "fi;" +
-                    "echo -e `"\033[1;32mpacman\033[0m`";" +
-                    "yes `"`" | pacman -Syyuu;" +
+                    "apt update && " +
+                    "  apt full-upgrade -y &&" +
+                    "  apt autoremove -y;" +
+                    "type snap > /dev/null 2>&1 &&"
+                    "  snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&"
+                    "  flatpak update -y;" +
                     "'"
                 )
-                $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
             } else {
-                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "sudo -v;" +
+                    "sudo apt update && " +
+                    "  sudo apt full-upgrade -y &&" +
+                    "  sudo apt autoremove -y;" +
+                    "type snap > /dev/null 2>&1 &&"
+                    "  sudo snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&"
+                    "  sudo flatpak update -y;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "-- $distPackageManagers" 
             }
             continue
