@@ -168,7 +168,7 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "type paru > /dev/null 2>&1; &&" +
+                    "type paru > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32mparu\033[0m`" &&" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
@@ -181,11 +181,11 @@ function runWSLUpdate {
                 $distPackageManagers = (
                     "eval '" +
                     "sudo -v;" +
-                    "type yay > /dev/null 2>&1; &&" +
+                    "type yay > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32myay\033[0m`" &&" +
                     "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
-                    "type paru > /dev/null 2>&1; &&" +
+                    "type paru > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32mparu\033[0m`" &&" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
