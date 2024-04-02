@@ -168,13 +168,12 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "if type paru > /dev/null 2>&1; then" +
-                    "  echo -e `"\033[1;32mparu\033[0m`";" +
-                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
+                    "type paru > /dev/null 2>&1; &&" +
+                    "  echo -e `"\033[1;32mparu\033[0m`" &&" +
+                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
                     "  exit `$?;" +
-                    "fi;" +
-                    "echo -e `"\033[1;32mpacman\033[0m`";" +
-                    "yes `"`" | pacman -Syyuu;" +
+                    "echo -e `"\033[1;32mpacman\033[0m`" &&" +
+                    "  yes `"`" | pacman -Syyuu;" +
                     "'"
                 )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
