@@ -372,7 +372,6 @@ function runWinGetUpdate {
 
 # Run programs if they exist
 if ( $IS_ADMIN -And $HAS_WLS ) { runWSLUpdate }
-exit 0 # DEBUG
 if ( $IS_ADMIN -And -Not $noWindows -And $HAS_PSWindowsUpdate ) {
     if ( -Not [BOOL](Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "DoNotConnectToWindowsUpdateInternetLocations" ) ) {
         Write-Host "Checking for windows updates..." -ForegroundColor Blue
