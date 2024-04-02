@@ -167,7 +167,7 @@ function runWSLUpdate {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
                 $distPackageManagers = (
-                    "bash -c 'eval '" +
+                    "bash -c `"`"`" eval '" +
                     "if type paru > /dev/null 2>&1; then" +
                     "  echo -e `"\033[1;32mparu\033[0m`";" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
@@ -175,12 +175,12 @@ function runWSLUpdate {
                     "fi;" +
                     "echo -e `"\033[1;32mpacman\033[0m`";" +
                     "yes `"`" | pacman -Syyuu;" +
-                    "''"
+                    "'`"`"`""
                 )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
             } else {
                 $distPackageManagers = (
-                    "bash -c 'eval '" +
+                    "bash -c `"`"`" eval '" +
                     "sudo -v;" +
                     "if type yay > /dev/null 2>&1; then" +
                     "  echo -e `"\033[1;32myay\033[0m`";" +
@@ -194,7 +194,7 @@ function runWSLUpdate {
                     "fi;" +
                     "echo -e `"\033[1;32mpacman\033[0m`";" +
                     "yes `"`" | sudo pacman -Syyuu;" +
-                    "''"
+                    "'`"`"`""
                 )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
             }
