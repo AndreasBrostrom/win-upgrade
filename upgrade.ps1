@@ -179,7 +179,6 @@ function runWSLUpdate {
                     "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
                     "  sudo flatpak update -y;" +
 
-                    "type yay > /dev/null 2>&1 && exit;" +
                     "type paru > /dev/null 2>&1 && exit;" +
                     "  echo -e `"\033[1;32mpacman\033[0m`" &&" +
                     "  yes `"`" | pacman -Syyuu;" +
