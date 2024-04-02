@@ -166,10 +166,18 @@ function runWSLUpdate {
         if ($dist.ToLower() -eq "arch") {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
-                $distPackageManagers = "eval 'yes `"`" | pacman -Syyuu'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "echo -e `'\033[1;32mpacman\033[0m`' && yes `"`" | pacman -Syyuu" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
             } else {
-                $distPackageManagers = "eval 'yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "echo -e `'\033[1;32mparu\033[0m`' && yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
             }
             continue
