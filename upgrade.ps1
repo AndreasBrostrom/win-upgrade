@@ -168,9 +168,10 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "echo -e `'\033[1;32mpacman\033[0m`' && yes `"`" | pacman -Syyuu" +
+                    "echo -e `"\033[1;32mpacman\033[0m`" && yes `"`" | pacman -Syyuu" +
                     "'"
                 )
+                echo $distPackageManagers
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
             } else {
                 $distPackageManagers = (
