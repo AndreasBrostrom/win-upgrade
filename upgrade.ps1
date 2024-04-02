@@ -168,7 +168,7 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "[ which $argv[1] 1>/dev/null 2>&1 ] && echo -e `'\033[1;32mparu\033[0m`' && yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always && exit $?;" +
+                    "[ which paru 1>/dev/null 2>&1 ] && echo -e `'\033[1;32mparu\033[0m`' && yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always && exit $?;" +
                     "echo -e `"\033[1;32mpacman\033[0m`" && yes `"`" | pacman -Syyuu" +
                     "'"
                 )
