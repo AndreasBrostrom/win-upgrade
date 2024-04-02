@@ -167,7 +167,7 @@ function runWSLUpdate {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
                 $distPackageManagers = (
-                    "eval 'bash -c " +
+                    "bash -c eval '" +
                     "if type paru > /dev/null 2>&1; then" +
                     "  echo -e `"\033[1;32mparu\033[0m`";" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
@@ -180,7 +180,7 @@ function runWSLUpdate {
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
             } else {
                 $distPackageManagers = (
-                    "eval 'bash -c " +
+                    "bash -c eval '" +
                     "sudo -v;" +
                     "if type yay > /dev/null 2>&1; then" +
                     "  echo -e `"\033[1;32myay\033[0m`";" +
