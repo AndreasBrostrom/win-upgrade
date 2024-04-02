@@ -219,12 +219,16 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
-                    "apt update && " +
+                    "echo -e `"\033[1;32mapt\033[0m`" &&" +
+                    "  apt update && " +
                     "  apt full-upgrade -y &&" +
                     "  apt autoremove -y;" +
+
                     "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
                     "  snap refresh;" +
                     "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
                     "  flatpak update -y;" +
                     "'"
                 )
@@ -237,6 +241,7 @@ function runWSLUpdate {
                     "  sudo apt update && " +
                     "  sudo apt full-upgrade -y &&" +
                     "  sudo apt autoremove -y;" +
+
                     "type snap > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32msnap\033[0m`" &&" +
                     "  sudo snap refresh;" +
@@ -258,6 +263,7 @@ function runWSLUpdate {
                     "  apt update && " +
                     "  apt full-upgrade -y &&" +
                     "  apt autoremove -y;" +
+
                     "type snap > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32msnap\033[0m`" &&" +
                     "  snap refresh;" +
@@ -275,6 +281,7 @@ function runWSLUpdate {
                     "  sudo apt update && " +
                     "  sudo apt full-upgrade -y &&" +
                     "  sudo apt autoremove -y;" +
+
                     "type snap > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32msnap\033[0m`" &&" +
                     "  sudo snap refresh;" +
