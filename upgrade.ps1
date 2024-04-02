@@ -178,7 +178,8 @@ function runWSLUpdate {
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
                     "  exit `$?;" +
                     "fi;" +
-                    "echo -e "\033[1;32mpacman\033[0m" && yes `"`" | pacman -Syyuu;" +
+                    "echo -e `"\033[1;32mpacman\033[0m`";" +
+                    "yes `"`" | pacman -Syyuu;" +
                     "'"
                 )
                 echo $distPackageManagers
