@@ -202,9 +202,9 @@ function runWSLUpdate {
                     "apt update && " +
                     "  apt full-upgrade -y &&" +
                     "  apt autoremove -y;" +
-                    "type snap > /dev/null 2>&1 &&"
+                    "type snap > /dev/null 2>&1 &&" +
                     "  snap refresh;" +
-                    "type flatpak > /dev/null 2>&1 &&"
+                    "type flatpak > /dev/null 2>&1 &&" +
                     "  flatpak update -y;" +
                     "'"
                 )
@@ -216,9 +216,9 @@ function runWSLUpdate {
                     "sudo apt update && " +
                     "  sudo apt full-upgrade -y &&" +
                     "  sudo apt autoremove -y;" +
-                    "type snap > /dev/null 2>&1 &&"
+                    "type snap > /dev/null 2>&1 &&" +
                     "  sudo snap refresh;" +
-                    "type flatpak > /dev/null 2>&1 &&"
+                    "type flatpak > /dev/null 2>&1 &&" +
                     "  sudo flatpak update -y;" +
                     "'"
                 )
