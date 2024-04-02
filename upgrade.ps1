@@ -174,7 +174,7 @@ function runWSLUpdate {
                     "  exit `$?;" +
                     "fi;" +
                     "if type paru > /dev/null 2>&1; then" +
-                    "  echo -e "\033[1;32mparu\033[0m";" +
+                    "  echo -e `"\033[1;32mparu\033[0m`";" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
                     "  exit `$?;" +
                     "fi;" +
