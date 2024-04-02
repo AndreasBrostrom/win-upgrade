@@ -171,7 +171,7 @@ function runWSLUpdate {
                     "if [[ which paru 1>/dev/null 2>&1; echo $? ]]; then" +
                     "  echo -e `'\033[1;32mparu\033[0m`';" +
                     "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
-                    "  exit $?;"
+                    "  exit $?;" +
                     "fi;" +
                     "echo -e `"\033[1;32mpacman\033[0m`" && yes `"`" | pacman -Syyuu;" +
                     "'"
