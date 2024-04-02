@@ -166,10 +166,49 @@ function runWSLUpdate {
         if ($dist.ToLower() -eq "arch") {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
-                $distPackageManagers = "eval 'yes `"`" | pacman -Syyuu'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "type paru > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mparu\033[0m`" &&" +
+                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  sudo snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  sudo flatpak update -y;" +
+
+                    "type paru > /dev/null 2>&1 && exit;" +
+                    "  echo -e `"\033[1;32mpacman\033[0m`" &&" +
+                    "  yes `"`" | pacman -Syyuu;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
             } else {
-                $distPackageManagers = "eval 'yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "sudo -v;" +
+                    "type yay > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32myay\033[0m`" &&" +
+                    "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always;" +
+                    "type paru > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mparu\033[0m`" &&" +
+                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  sudo snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  sudo flatpak update -y;" +
+
+                    "type yay > /dev/null 2>&1 && exit;" +
+                    "type paru > /dev/null 2>&1 && exit;" +
+                    "echo -e `"\033[1;32mpacman\033[0m`" &&" +
+                    "  yes `"`" | sudo pacman -Syyuu;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
             }
             continue
@@ -177,10 +216,39 @@ function runWSLUpdate {
         if ($dist.ToLower() -eq "debian") { 
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
-                $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "echo -e `"\033[1;32mapt\033[0m`" &&" +
+                    "  apt update && " +
+                    "  apt full-upgrade -y &&" +
+                    "  apt autoremove -y;" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  flatpak update -y;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
             } else {
-                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "sudo -v;" +
+                    "echo -e `"\033[1;32mapt\033[0m`" &&" +
+                    "  sudo apt update && " +
+                    "  sudo apt full-upgrade -y &&" +
+                    "  sudo apt autoremove -y;" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  sudo snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  sudo flatpak update -y;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "-- $distPackageManagers" 
             }
             continue
@@ -188,10 +256,39 @@ function runWSLUpdate {
         if ($dist.ToLower() -eq "ubuntu") {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
             if (-not $suMode) {
-                $distPackageManagers = "eval 'apt update && apt full-upgrade -y && apt autoremove -y && snap refresh'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "echo -e `"\033[1;32mapt\033[0m`" &&" +
+                    "  apt update && " +
+                    "  apt full-upgrade -y &&" +
+                    "  apt autoremove -y;" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  flatpak update -y;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "--user root", "-- $distPackageManagers" 
             } else {
-                $distPackageManagers = "eval 'sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo snap refresh'"
+                $distPackageManagers = (
+                    "eval '" +
+                    "sudo -v;" +
+                    "echo -e `"\033[1;32mapt\033[0m`" &&" +
+                    "  sudo apt update && " +
+                    "  sudo apt full-upgrade -y &&" +
+                    "  sudo apt autoremove -y;" +
+
+                    "type snap > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32msnap\033[0m`" &&" +
+                    "  sudo snap refresh;" +
+                    "type flatpak > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
+                    "  sudo flatpak update -y;" +
+                    "'"
+                )
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution ubuntu", "-- $distPackageManagers" 
             }
             continue
