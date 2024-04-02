@@ -168,6 +168,43 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
+                    "if type paru > /dev/null 2>&1; then" +
+                    "  echo -e `"\033[1;32mparu\033[0m`";" +
+                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
+                    "  exit `$?;" +
+                    "fi;" +
+                    "echo -e `"\033[1;32mpacman\033[0m`";" +
+                    "yes `"`" | pacman -Syyuu;" +
+                    "'"
+                )
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
+            } else {
+                $distPackageManagers = (
+                    "eval '" +
+                    "sudo -v;" +
+                    "if type yay > /dev/null 2>&1; then" +
+                    "  echo -e `"\033[1;32myay\033[0m`";" +
+                    "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always;" +
+                    "  exit `$?;" +
+                    "fi;" +
+                    "if type paru > /dev/null 2>&1; then" +
+                    "  echo -e `"\033[1;32mparu\033[0m`";" +
+                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always;" +
+                    "  exit `$?;" +
+                    "fi;" +
+                    "echo -e `"\033[1;32mpacman\033[0m`";" +
+                    "yes `"`" | sudo pacman -Syyuu;" +
+                    "'"
+                )
+                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
+            }
+            continue
+        }
+        if ($dist.ToLower() -eq "debian") { 
+            Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
+            if (-not $suMode) {
+                $distPackageManagers = (
+                    "eval '" +
                     "if type yay > /dev/null 2>&1; then" +
                     "  echo -e `"\033[1;32myay\033[0m`";" +
                     "  yes `"`" | yay -Syyu --sudoloop --noconfirm --color=always;" +
@@ -182,21 +219,6 @@ function runWSLUpdate {
                     "yes `"`" | pacman -Syyuu;" +
                     "'"
                 )
-                echo $distPackageManagers
-                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "--user root", "-- $distPackageManagers"
-            } else {
-                $distPackageManagers = (
-                    "eval '" +
-                    "echo -e `'\033[1;32mparu\033[0m`' && yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always" +
-                    "'"
-                )
-                Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution arch", "-- $distPackageManagers"
-            }
-            continue
-        }
-        if ($dist.ToLower() -eq "debian") { 
-            Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
-            if (-not $suMode) {
                 $distPackageManagers = "eval 'yes "" | apt update && apt full-upgrade -y && apt autoremove -y'"
                 Start-Process -NoNewWindow -Wait -FilePath wsl.exe -ArgumentList "--distribution debian", "--user root", "-- $distPackageManagers" 
             } else {
