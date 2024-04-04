@@ -153,7 +153,7 @@ function runWSLUpdate {
         Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
         return
     }
-    if ( -Not distrosList.contain("error") ) {
+    if ( $distrosList.contains("error") ) {
         if ($updateWSL) {
             Write-Host "WSL have been updated and seams to have issues. Try again later...`n" -ForegroundColor Red
         } else {
@@ -170,6 +170,8 @@ function runWSLUpdate {
     Write-Host "`nUpdating following distros:"
     foreach ($dist in $DistrosList) { Write-Host " - $dist" }
 
+    # Update distros
+    foreach ($dist in $DistrosList) {
         # Variable $dist apparently does not work for Start-Process argumentList collected earlier or in the loop it self eather
         if ($dist.ToLower() -eq "arch") {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
