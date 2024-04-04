@@ -33,7 +33,7 @@ foreach ($arg in $args) {
 
 
 if ($help) {
-    Write-Host  "Usage: ${programName} [-w] [-su] [-v] [-help]"
+    Write-Host  "Usage: ${programName} [-w] [-su] [-v] [-h]"
     Write-Host  ""
     Write-Host  "    -h, --help                Show this help"
     Write-Host  "    -w, --noWindowsUpdate     Disable update check for windows"
