@@ -170,6 +170,8 @@ function runWSLUpdate {
     Write-Host "`nUpdating following distros:"
     foreach ($dist in $DistrosList) { Write-Host " - $dist" }
 
+    # Update distros
+    foreach ($dist in $DistrosList) {
         # Variable $dist apparently does not work for Start-Process argumentList collected earlier or in the loop it self eather
         if ($dist.ToLower() -eq "arch") {
             Write-Host "`nUpdating $dist..." -ForegroundColor DarkCyan
