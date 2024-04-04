@@ -153,7 +153,7 @@ function runWSLUpdate {
         Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
         return
     }
-    if ( -Not $distrosList.contains("error") ) {
+    if ( $distrosList.contains("error") ) {
         if ($updateWSL) {
             Write-Host "WSL have been updated and seams to have issues. Try again later...`n" -ForegroundColor Red
         } else {
