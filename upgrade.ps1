@@ -134,7 +134,7 @@ function runWSLUpdate {
 
     Write-Host "Updating WSL distros..." -ForegroundColor Blue
     if (-not $suMode) {
-        Write-Host "This will update using the root user.`nTo update using your distrobution user run $programName with the argument --suMode" -ForegroundColor DarkGray
+        Write-Host "This will update using the root user.`nTo update using your distribution user run $programName with the argument --suMode" -ForegroundColor DarkGray
     }
     
     $distrosList = @()
@@ -144,6 +144,8 @@ function runWSLUpdate {
             $i++
             if ($i -lt 2) {return}
             if ($_ -eq "") {return}
+            if ($_.contains("Distributions")) {return}
+            if ($_.contains("https://aka.ms/wslstore")) {return}
             $dist = -split "$_"
             $distName = $dist[0]
             $DistrosList += $distName
@@ -162,8 +164,8 @@ function runWSLUpdate {
         return
     }
 
-    if ($distrosList.count -eq 0) {
-        Write-Host "No WSL distrobutions detected skipping...`n" -ForegroundColor Red
+    if ( $distrosList.count -eq 0 ) {
+        Write-Host "No WSL distributions detected skipping...`n" -ForegroundColor Red
         return
     }
 
