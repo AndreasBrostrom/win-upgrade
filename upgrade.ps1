@@ -11,7 +11,7 @@ foreach ($arg in $args) {
     if ($arg -in @("--help", "-h")) {
         $help = $TRUE
         continue
-    } elseif ($arg -in @("-noWindowsUpdate", "-w")) {
+    } elseif ($arg -in @("--noWindowsUpdate", "-w")) {
         $noWindows = $TRUE
         continue
     } elseif ($arg -in @("--suMode", "-su")) {
