@@ -144,6 +144,7 @@ function runWSLUpdate {
             $i++
             if ($i -lt 2) {return}
             if ($_ -eq "") {return}
+            if ($_.contains("Copyright")) {return}
             if ($_.contains("Distributions")) {return}
             if ($_.contains("https://aka.ms/wslstore")) {return}
             $dist = -split "$_"
