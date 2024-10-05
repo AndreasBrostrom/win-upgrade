@@ -142,18 +142,17 @@ function runWSLUpdate {
         $i=0
         wsl.exe --list | ForEach-Object -Process {
             $i++
-            if ($i -lt 2) {return}
             if ($_ -eq "") {return}
-            if ($_.contains("Copyright")) {break}
-            if ($_.contains("Distributions")) {break}
-            if ($_.contains("https://aka.ms/wslstore")) {break}
+            if ($_ -like "Copyright*") {break}
+            if ($i -lt 2) {return}
             $dist = -split "$_"
             $distName = $dist[0]
             $DistrosList += $distName
         }
     }
     Catch {
-        Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
+        Write-Host "No WSL distributions detected skipping..." -ForegroundColor Yellow
+        #Write-Host "WSL not supported via remote connections...`nSee https://github.com/microsoft/WSL/issues/7900`n" -ForegroundColor Red
         return
     }
     if ( $distrosList.contains("error") ) {
@@ -181,9 +180,10 @@ function runWSLUpdate {
             if (-not $suMode) {
                 $distPackageManagers = (
                     "eval '" +
+                    "type yay > /dev/null 2>&1 &&" +
+                    "  echo -e `"\033[33myay: can´t install AUR package as root use --suMode to run as your user.\033[0m`";" +
                     "type paru > /dev/null 2>&1 &&" +
-                    "  echo -e `"\033[1;32mparu\033[0m`" &&" +
-                    "  yes `"`" | paru -Syyu --sudoloop --noconfirm --color=always &&" +
+                    "  echo -e `"\033[33mparu: can´t install AUR package as root use --suMode to run as your user.\033[0m`";" +
 
                     "type snap > /dev/null 2>&1 &&" +
                     "  echo -e `"\033[1;32msnap\033[0m`" &&" +
@@ -192,7 +192,6 @@ function runWSLUpdate {
                     "  echo -e `"\033[1;32mflatpak\033[0m`" &&" +
                     "  sudo flatpak update -y;" +
 
-                    "type paru > /dev/null 2>&1 && exit;" +
                     "  echo -e `"\033[1;32mpacman\033[0m`" &&" +
                     "  yes `"`" | pacman -Syyuu;" +
                     "'"
