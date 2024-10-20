@@ -82,7 +82,8 @@ if (!$IS_ADMIN) {
     Write-Host "${programName} is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
     # check if have sudo programs installed
-        $sudoScripts =  "$env:USERPROFILE\scoop\shims\sudo",
+        $sudoScripts =  "C:\Windows\system32\sudo.exe",
+                        "$env:USERPROFILE\scoop\shims\sudo",
                         "$env:USERPROFILE\scoop\shims\sudo.ps1",
                         "$env:PROGRAMDATA\scoop\shims\sudo",
                         "$env:PROGRAMDATA\scoop\shims\sudo.ps1",

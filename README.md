@@ -21,8 +21,8 @@ The script can detect:
  - [WinGet](https://docs.microsoft.com/en-us/windows/package-manager/winget/) (Windows Package Manager)
 
 ```pwsh
-PS > upgrade --help     
-Usage: upgrade [-w] [-su] [-v] [-help]
+PS > upgrade --help
+Usage: upgrade [-w] [-su] [-v] [-h]
 
     -h, --help                Show this help
     -w, --noWindowsUpdate     Disable update check for windows
@@ -34,7 +34,7 @@ Usage: upgrade [-w] [-su] [-v] [-help]
 
 ```
 
-***Note!** When using a sudo windows script i recommend you using [lukesampson sudo](https://github.com/lukesampson/psutils/blob/master/sudo.ps1) simply run `scoop install sudo`.*
+***Note!** When using a sudo windows script i recommend you using [lukesampson sudo](https://github.com/lukesampson/psutils/blob/master/sudo.ps1) `scoop install sudo`. or windows sudo with configured inline.*
 
 ## Install
 
