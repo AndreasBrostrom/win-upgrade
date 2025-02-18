@@ -27,9 +27,7 @@ foreach ($arg in $args) {
         Write-Host "${programName}: '$arg' unknown argument" -ForegroundColor Red
         exit 1
     }
-
 }
-
 
 
 if ($help) {
@@ -37,13 +35,15 @@ if ($help) {
     Write-Host  ""
     Write-Host  "    -h, --help                Show this help"
     Write-Host  "    -w, --noWindowsUpdate     Disable update check for windows"
-    Write-Host  "    -su, --suMode             Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms."
+    Write-Host  "    -su, --suMode             Disable suMode and require sudo password on default user for wsl distributions update. This may lead to required password and other confirmations."
     Write-Host
     Write-Host  "    --updateWSL               Upgrade WSL client"
     Write-Host
     Write-Host  "    -v, --version             Show current version"
     exit 0
 }
+
+
 
 $BUILD = "GIT"
 if ( $Version ) {
@@ -88,15 +88,15 @@ if (!$IS_ADMIN) {
     Write-Host "${programName} is not running as Administrator. Start PowerShell by using the Run as Administrator option" -ForegroundColor Red -NoNewline
     
     # check if have sudo programs installed
-        $sudoScripts =  "C:\Windows\system32\sudo.exe",
-                        "$env:USERPROFILE\scoop\shims\sudo",
-                        "$env:USERPROFILE\scoop\shims\sudo.ps1",
-                        "$env:PROGRAMDATA\scoop\shims\sudo",
-                        "$env:PROGRAMDATA\scoop\shims\sudo.ps1",
-                        "$env:PROGRAMDATA\chocolatey\bin\Sudo.exe",
-                        "$env:USERPROFILE\.bin\sudo.ps1",
-                        "$env:SCOOP_GLOBAL\shims\sudo",
-                        "$env:SCOOP_GLOBAL\shims\sudo.ps1"
+    $sudoScripts = "$env:WINDIR\system32\sudo.exe",
+                   "$env:USERPROFILE\scoop\shims\sudo",
+                   "$env:USERPROFILE\scoop\shims\sudo.ps1",
+                   "$env:PROGRAMDATA\scoop\shims\sudo",
+                   "$env:PROGRAMDATA\scoop\shims\sudo.ps1",
+                   "$env:PROGRAMDATA\chocolatey\bin\Sudo.exe",
+                   "$env:USERPROFILE\.bin\sudo.ps1",
+                   "$env:SCOOP_GLOBAL\shims\sudo",
+                   "$env:SCOOP_GLOBAL\shims\sudo.ps1"
 
     foreach ($sudoScript in $sudoScripts) { if ( [System.IO.File]::Exists("$sudoScript") ) { [bool] $hasSudo = 1; break } }
     if ($hasSudo) { Write-Host " or run with sudo" -ForegroundColor Red -NoNewline }
@@ -132,7 +132,6 @@ function Test-PendingReboot {
 
 # Upgrade functions
 function runWSLUpdate {
-
     if ($updateWSL) {
         Write-Host "Updating WSL client..." -ForegroundColor Blue
         wsl --update
@@ -319,7 +318,6 @@ function runWSLUpdate {
     Write-Host "`nWindows Subsystem for Linux update compleat...`n`n" -ForegroundColor Green
 }
 function runWindowsUpdate {
-
     Try {
         Write-Host "Checking for updates..."
         Write-Host "This may take some time stand by..." -ForegroundColor DarkGray
