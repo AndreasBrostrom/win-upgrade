@@ -51,6 +51,12 @@ if ( $Version ) {
     exit 0
 }
 
+# Check if running on Windows
+if ( -not $IsWindows ) {
+    Write-Host "${programName} is only supported on Windows" -ForegroundColor Red
+    exit 1
+}
+
 $IS_ADMIN = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 
 # Check for package managers
