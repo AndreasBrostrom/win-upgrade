@@ -26,7 +26,8 @@ Usage: upgrade [-w] [-su] [-v] [-h]
 
     -h, --help                Show this help
     -w, --noWindowsUpdate     Disable update check for windows
-    -su, --suMode             Disable suMode and require sudo password on a user level for wsl update. This may lead to required confirms.
+    -su, --suMode             Disable suMode and require sudo password on default user for wsl distributions update.
+                              This may lead to required password and other confirmations.
 
     --updateWSL               Upgrade WSL client
 
